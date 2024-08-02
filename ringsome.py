@@ -17,7 +17,11 @@ def get():
 
 @get.command()
 def countries():
-    print("Getting countries")
+    r = requests.get(BASE_URL + "/countries")
+    if r.status_code != 200:
+        r.raise_for_status()
+    for code in r.json()["results"]["countrycodes"]:
+        print(f"{code}\t{countrycodes.alpha2[code]}")
 
 
 @get.command()
@@ -27,10 +31,6 @@ def nodes():
 
 def main():
     cli()
-    r = requests.get(BASE_URL + "/countries")
-    if r.status_code != 200:
-        r.raise_for_status()
-    print(r.json()["results"]["countrycodes"])
 
 
 if __name__ == "__main__":
