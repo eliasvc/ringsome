@@ -33,8 +33,12 @@ def countries():
 
 
 @get.command()
-def nodes():
-    r = requests.get(BASE_URL + "/nodes/active")
+@click.option("--country", help="Alpha-2 country code")
+def nodes(country):
+    if country:
+        r = requests.get(BASE_URL + f"/nodes/active/country/{country}")
+    else:
+        r = requests.get(BASE_URL + "/nodes/active")
     if r.status_code != 200:
         r.raise_for_status()
     result = r.json()["results"]["nodes"]
