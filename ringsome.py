@@ -15,7 +15,7 @@ def cli():
 
 @cli.group()
 def get():
-    click.echo("Get command")
+    pass
 
 
 @get.command()
