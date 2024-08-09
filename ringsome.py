@@ -1,3 +1,5 @@
+import subprocess
+import sys
 import requests
 import click
 from rich.console import Console
@@ -60,6 +62,39 @@ def nodes(country):
         )
     console = Console(emoji=False)
     console.print(table)
+
+
+def ssh(user, host, command, port=22):
+    output = subprocess.run(["ssh", f"{user}@{host}", "-p", f"{port}", command])
+    return output
+
+
+@cli.command()
+@click.option("--host", type=str, help="Target hostname or IP. Requires --user")
+@click.option("--user", type=str, help="SSH user to be used in connection")
+@click.option(
+    "--port",
+    type=str,
+    default=22,
+    show_default=True,
+    help="Port to be used in SSH connection. Default is 22",
+)
+@click.option(
+    "--command", required=True, type=str, help="Command to execute in target host"
+)
+def run(host, user, command, port):
+    """Run commmand on specified host or on a random number of Ring hosts from a specified country"""
+    if host and not user:
+        print(
+            "Usage: ringsome.py run [OPTIONS]\n"
+            "Try 'ringsome.py run --help' for help.\n\n"
+            "Error: '--host' requires '--user'."
+        )
+        sys.exit(2)
+    elif host:
+        output = ssh(user, host, command, port)
+        if output.returncode == 0:
+            print(output.stdout)
 
 
 def main():
